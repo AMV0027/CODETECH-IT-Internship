@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    
+    <div class="bg-gray-900 min-h-screen p-6 text-orange-500 flex flex-col justify-start items-center">
+        <div class="flex felx-row justify-between items-center w-[500px]">
+            <h1 class="text-2xl font-bold m-4">
+                To-Do App <span class="animate-pulse">🎯</span>
+            </h1>
+            <a href="/completed" class="mt-4 text-white hover:text-white hover:bg-tansparent bg-orange-500 p-2 m-1 rounded-md">
+                Completed tasks
+            </a>
+        </div>
+        <form action="/add" method="post" class="flex w-[500px] flex-row flex-wrap justify-center items-centers bg-gray-500 p-4 rounded-md">
+            <input type="text" name="task" placeholder="Enter task" class="m-1 p-2 text-md rounded-md">
+            <input type="notes" name="notes" placeholder="Notes : " class="m-1 p-2 text-md rounded-md">
+            <select name="category"  class="m-1 p-2 text-md rounded-md">
+                <option value="">Select Category</option>
+                <option value="Work">Work 💼</option>
+                <option value="Personal">Personal 🙎</option>
+                <!-- Add more options as needed -->
+            </select>
+            <input type="date" name="due_date" class="m-1 p-2 text-md rounded-md">
+            <select name="priority"  class="m-1 p-2 text-md rounded-md">
+                <option value="">Select Priority</option>
+                <option value="Low">Low 🟢</option>
+                <option value="Medium">Medium 🟡</option>
+                <option value="High">High 🔴</option>
+                <!-- Add more options as needed -->
+            </select>
+            <button type="submit"  class="m-1 bg-orange-500 hover:bg-transparent hover:text-orange-500 border-2 border-orange-500 text-white pr-10 pl-10 p-2 text-md rounded-md">
+                Add ✍️
+            </button>
+        </form>
+        <h1 class="text-2xl font-bold m-2 text-start mt-6">
+            Tasks 📋
+        </h1>
+        
+        <div class=" flex flex-wrap justify-center">
+            {% for task in tasks %}
+            <div class="p-3 m-2 bg-gray-500 rounded-md w-[500px]  hover:border-orange-500 border-2 border-gray-500">
+                <div class="flex flex-row justify-start">
+                    <h2 class="text-xl font-bold text-white">
+                        {{task['name']}}
+                    </h2>
+                    <p class="font-bold text-xs mt-2 p-1">
+                        {{task['priority']}}
+                    </p>
+                </div>
+                
+                <div class="flex flex-row justify-between text-white">
+                    <p class=" text-xs">
+                        <b class="text-orange-500">Category : </b>{{task['category']}}
+                    </p>
+                    <p class=" text-xs">
+                        <b class="text-orange-500">Due Date : </b>{{task['due_date']}}
+                    </p>
+                </div>
+                {% if task['notes'] is not none %}
+                    <p class="p-2 mt-2 mb-6 text-white border-[1px] border-white rounded-md">
+                        {{ task['notes'] }}
+                    </p>
+                {% endif %}
+                <form action="/remove/{{ loop.index0 }}" method="post" style="display: inline;">
+                    <button type="submit" class="bg-orange-500 text-white p-1 rounded-md hover:bg-tansparent hover:text-white pr-4 pl-4">
+                        Completed ✅?
+                    </button>
+                </form>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

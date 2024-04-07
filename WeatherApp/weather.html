@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="flex flex-col items-center justify-start pt-28 bg-gray-900 text-orange-500 min-h-screen">
+        <h1 class="text-4xl font-bold text-center text-orange-500 mb-8">Weather Forecast</h1>
+        <form id="search-form" class="flex flex-row justify-center mb-4">
+            <div class="flex flex-row justify-center w-[80vw]">
+                <input type="text" id="search-input" class="p-2 w-full text-xl rounded-bl-xl rounded-tl-xl" placeholder="Enter location (e.g., city name)">
+                <button type="submit" class="p-2 bg-orange-500 text-white  rounded-br-xl pr-6 pl-6 rounded-tr-xl">Search</button>
+            </div>
+        </form>
+        <div id="weather-info" class="bg-transaprent border-2 border-orange-500 p-4 w-[80vw] rounded-xl">
+            <p class="font-bold">Search a country or a State</p>
+        </div>
+    </div>
+
+    <!-- Include JavaScript -->
+    <script>
+        const weatherIcons = {
+            "clear sky": "https://images.pexels.com/photos/281260/pexels-photo-281260.jpeg?cs=srgb&dl=pexels-francesco-ungaro-281260.jpg&fm=jpg",
+            "few clouds": "https://www.shutterstock.com/image-photo/few-random-white-clouds-blue-600nw-1780046486.jpg",
+            "scattered clouds": "https://media.istockphoto.com/id/645173476/photo/cirrocumulus-clouds-cloudscape.webp?b=1&s=170667a&w=0&k=20&c=g_bYn51s1llK9hhj6gy-QX3c3PyH9Cml2EHG8t5DsHE=",
+            "broken clouds": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/625a747a-061b-477d-958f-a0d6cea9e4cb/dax9bd4-dd0da73d-5b6e-415c-b05e-19471f366e5a.jpg/v1/fill/w_1024,h_768,q_75,strp/broken_clouds_by_kevintheman_dax9bd4-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NzY4IiwicGF0aCI6IlwvZlwvNjI1YTc0N2EtMDYxYi00NzdkLTk1OGYtYTBkNmNlYTllNGNiXC9kYXg5YmQ0LWRkMGRhNzNkLTViNmUtNDE1Yy1iMDVlLTE5NDcxZjM2NmU1YS5qcGciLCJ3aWR0aCI6Ijw9MTAyNCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.2HBtScMyydNDUe606gk2Jd8RHs6iM-76feSI7Dc3sLw",
+            "overcast clouds": "https://www.rochesterfirst.com/wp-content/uploads/sites/66/2021/04/black-rain-abstract-dark-power-1-1.jpg?w=900",
+            "light rain": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeJWvlxdgWXom73YKRxDHZONow1f0BXxDfTa2_39_Qhw&s",
+            "moderate rain": "https://images.mid-day.com/images/images/2023/aug/Mumbai-rains-nb_d.jpg",
+            "heavy rain": "https://th-i.thgim.com/public/incoming/sf7n4u/article65998632.ece/alternates/FREE_1200/106962F0-CF07-4399-A5A8-D593288AF9AD.jpeg",
+            "light snow": "https://www.travelandleisure.com/thmb/qhm9qE1-raJ2YT0G56r2miufxgY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/drivingsnow1219-82570f5bd4e341978924ed2812ba8e3a.jpg",
+            "moderate snow": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Snow_packed_trees.jpg/1200px-Snow_packed_trees.jpg",
+            "heavy snow": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit-760w,f_auto,q_auto:best/rockcms/2023-11/231129-vermont-mb-1114-c393e8.jpg",
+            "mist": "https://i0.wp.com/www.brixtonbuzz.com/images/brixton-london-storm-01.jpg?w=735",
+            "fog": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQn0NHE4REbn8o_JkyJWRtPbgcWIuiw4lCvsVx_qfqur1Mkn0dO3pIgS-OPALsKSTbQ1D4&usqp=CAU",
+            "drizzle": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDiF0RzRiw0pOJK55qRJcFrBl9aHp9VSidDDajYaezPw&s",
+            "thunderstorm": "https://cdn.britannica.com/62/158162-050-9FDE49B4/thunderstorm-and-lightning.jpg"
+            // Add more weather conditions and corresponding image URLs as needed
+        };
+
+        const form = document.getElementById('search-form');
+        const input = document.getElementById('search-input');
+        const weatherInfo = document.getElementById('weather-info');
+
+        // Fetch weather data from API
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const location = input.value.trim();
+            if (location) {
+                searchWeather(location);
+            }
+        });
+
+        function searchWeather(location) {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=02b9d420be2f48fd0d976efe4d646c69&units=metric`)
+                .then(response => response.json())
+                .then(data => {
+                    const temperature = data.main.temp;
+                    const description = data.weather[0].description;
+                    const city = data.name;
+                    const country = data.sys.country;
+                    const weatherIconUrl = weatherIcons[description.toLowerCase()]; // Fixed this line
+                    const weatherHtml = `
+                        <h2 class="text-2xl text-white font-semibold animate-pulse mb-2">${city}, ${country}</h2>
+                        <p class="text-white"><strong class="text-orange-500">Temperature:</strong> ${temperature}°C</p>
+                        <p class="text-white"><strong class="text-orange-500">Weather:</strong> ${description}</p>
+                        <img src=${weatherIconUrl} class="h-[250px] w-full mt-6 rounded-xl border-2 border-transparent hover:border-orange-500" />
+                    `;
+                    weatherInfo.innerHTML = weatherHtml;
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                    weatherInfo.innerHTML = `<p class="text-red-600">An error occurred. Please try again later.</p>`;
+                });
+        }
+    </script>
+</body>
+</html>
